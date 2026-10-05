@@ -1,0 +1,63 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Environnements virtuels ---
+.venv/
+venv/
+env/
+ENV/
+.conda/
+
+# --- Jupyter / Colab ---
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# --- Données & modèles (trop volumineux pour git) ---
+data/
+datasets/
+*.csv
+*.zip
+*.tar
+*.tar.gz
+*.npy
+*.npz
+
+# Poids / modèles entraînés
+models/
+*.h5
+*.keras
+*.hdf5
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.tflite
+
+# YOLO (poids & runs)
+*.weights
+yolo*.pt
+runs/
+
+# Logs TensorBoard
+logs/
+*.log
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# --- Secrets ---
+.env
+*.key
+kaggle.json

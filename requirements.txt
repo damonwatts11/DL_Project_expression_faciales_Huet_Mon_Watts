@@ -1,0 +1,24 @@
+# Fondamentaux du Deep Learning — Reconnaissance d'expressions faciales
+# Python 3.10+ recommandé (compatible Google Colab)
+
+# Deep learning (Keras est fourni avec TensorFlow)
+tensorflow>=2.15
+
+# Calcul & données
+numpy>=1.24
+pandas>=2.0
+scikit-learn>=1.3
+
+# Vision par ordinateur
+opencv-python>=4.8
+Pillow>=10.0
+
+# Visualisation
+matplotlib>=3.7
+seaborn>=0.13
+
+# Extension — détection de visages (parties 8 & 9)
+ultralytics>=8.1
+
+# Notebooks (local ; déjà présent sur Colab)
+jupyter>=1.0
