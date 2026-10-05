@@ -20,8 +20,9 @@ ENV/
 .ipynb_checkpoints/
 */.ipynb_checkpoints/*
 
-# --- Données & modèles (trop volumineux pour git) ---
-data/
+# --- Donnees (trop volumineux pour git ; on garde le dossier) ---
+data/*
+!data/.gitkeep
 datasets/
 *.csv
 *.zip
@@ -30,8 +31,9 @@ datasets/
 *.npy
 *.npz
 
-# Poids / modèles entraînés
-models/
+# --- Modeles entraines (on garde le dossier) ---
+models/*
+!models/.gitkeep
 *.h5
 *.keras
 *.hdf5
