@@ -13,13 +13,12 @@ une vidéo — contenant une ou plusieurs personnes.
 
 ## Équipe
 
-Projet réalisé en groupe de trois (enrichissement conséquent requis, cf. barème).
+Projet réalisé en binôme.
 
 | Membre | GitHub |
 |--------|--------|
-| Watts  | [@damonwatts11](https://github.com/damonwatts11) |
-| Huet   | [@SpectreAH](https://github.com/SpectreAH) |
-| Mon    | _à compléter_ |
+| Mon Watts | [@damonwatts11](https://github.com/damonwatts11) |
+| Huet      | [@SpectreAH](https://github.com/SpectreAH) |
 
 **Formatrice :** Hanane Zerdoum · **Soutenance :** vendredi 9 octobre 2026
 
@@ -45,6 +44,8 @@ obligatoire ; les parties 7 à 9 sont des enrichissements.
 | 7 | Enrichissement avec les nouvelles notions du cours | Enrichissement |
 | 8 | Détection et analyse de plusieurs visages (YOLO) | Extension |
 | 9 | Extension à la vidéo | Extension (bonus) |
+
+Le travail se fait dans [`notebooks/expressions_faciales.ipynb`](notebooks/expressions_faciales.ipynb).
 
 ## Pipeline visé
 
