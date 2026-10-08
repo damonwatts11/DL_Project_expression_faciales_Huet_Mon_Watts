@@ -17,8 +17,8 @@ Projet réalisé en binôme.
 
 | Membre | GitHub |
 |--------|--------|
-| Mon Watts | [@damonwatts11](https://github.com/damonwatts11) |
-| Huet      | [@SpectreAH](https://github.com/SpectreAH) |
+| Daniel Mon Watts | [@damonwatts11](https://github.com/damonwatts11) |
+| Alexandre Huet      | [@SpectreAH](https://github.com/SpectreAH) |
 
 **Formatrice :** Hanane Zerdoum · **Soutenance :** vendredi 9 octobre 2026
 
