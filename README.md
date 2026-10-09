@@ -2,14 +2,11 @@
 
 Projet **Fondamentaux du Deep Learning** — Master, Semestre 1 (2026-2027).
 
-Système de vision par ordinateur qui analyse des images de visages et reconnaît
-différentes expressions faciales (ex. : colère, dégoût, peur, joie, tristesse,
-surprise, neutre). Le projet part d'un classifieur travaillant sur un visage
-déjà extrait, puis évolue vers un système capable d'analyser une image — voire
-une vidéo — contenant une ou plusieurs personnes.
+Système de vision par ordinateur qui reconnaît l'expression faciale d'un visage
+(8 classes : neutre, joie, surprise, tristesse, colère, dégoût, peur, mépris),
+puis l'étend à la **détection de plusieurs visages** (YOLO) sur image et vidéo.
 
-> Problème de **classification multiclasse** : `K` classes → `K` neurones de
-> sortie → **Softmax**.
+> Classification **multiclasse** : 8 classes → 8 neurones de sortie → **Softmax**.
 
 ## Équipe
 
@@ -18,76 +15,101 @@ Projet réalisé en binôme.
 | Membre | GitHub |
 |--------|--------|
 | Daniel Mon Watts | [@damonwatts11](https://github.com/damonwatts11) |
-| Alexandre Huet      | [@SpectreAH](https://github.com/SpectreAH) |
+| Alexandre Huet   | [@SpectreAH](https://github.com/SpectreAH) |
 
-**Formatrice :** Hanane Zerdoum · **Soutenance :** vendredi 9 octobre 2026
+**Formatrice :** Hanane Zerdoum
 
-## Outils
+## Résultats
 
-- Python, Google Colab
-- Keras / TensorFlow
-- YOLO (extension — détection de visages)
+| Modèle | Accuracy test | F1 macro test |
+|--------|:-------------:|:-------------:|
+| Réseau dense (référence) | 50,6 % | — |
+| CNN de référence | 72,6 % | 0,44 |
+| **Modèle final** (CNN, learning rate 1e-4) | **73,3 %** | **0,57** |
 
-## Organisation du projet
+Le **F1 macro** (moyenne par classe) est notre critère principal car le dataset
+est très déséquilibré : l'accuracy seule favorise les classes majoritaires.
 
-Le projet est découpé en neuf parties. Les parties 1 à 6 constituent le socle
-obligatoire ; les parties 7 à 9 sont des enrichissements.
+Comparaison des expériences (sur la **validation**) :
 
-| Partie | Contenu | Statut |
-|:------:|---------|--------|
-| 1 | Recherche, compréhension et préparation des données | Obligatoire |
-| 2 | Modèle de référence (réseau dense) | Obligatoire |
-| 3 | Construction d'un CNN avec Keras | Obligatoire |
-| 4 | Entraînement du réseau | Obligatoire |
-| 5 | Évaluation et analyse des erreurs | Obligatoire |
-| 6 | Expérimentation et amélioration (≥ 3 expériences) | Obligatoire |
-| 7 | Enrichissement avec les nouvelles notions du cours | Enrichissement |
-| 8 | Détection et analyse de plusieurs visages (YOLO) | Extension |
-| 9 | Extension à la vidéo | Extension (bonus) |
+| # | Modification | Val. accuracy | Val. F1 macro |
+|:-:|--------------|:-------------:|:-------------:|
+| 0 | CNN de référence | 0,747 | 0,463 |
+| 1 | Data augmentation | 0,771 | 0,493 |
+| 2 | Poids des classes (`balanced`) | 0,350 | 0,090 |
+| 3 | **Learning rate 1e-4** (retenu) | 0,750 | **0,586** |
 
-Le travail se fait dans [`notebooks/expressions_faciales.ipynb`](notebooks/expressions_faciales.ipynb).
+## Dataset — FER+ (FERPlus)
 
-## Pipeline visé
+[FERPlus](https://github.com/microsoft/FERPlus) reprend les images de **FER-2013**
+et remplace les labels par une **re-annotation à 10 votes** (plus fiable). Deux fichiers,
+alignés ligne à ligne :
 
-```
-Image / Vidéo → YOLO (détection des visages) → extraction → CNN → Softmax
-              → expression + probabilité
-```
+| Fichier | Contenu | Source |
+|---------|---------|--------|
+| `fer2013.csv` | pixels 48×48 niveaux de gris (`emotion, pixels, Usage`) | Kaggle (FER-2013) |
+| `fer2013new.csv` | votes des 8 émotions + `unknown`, `NF` | repo microsoft/FERPlus (suivi ici dans `data/`) |
+
+- **35 887 images** ; après **vote majoritaire** (on écarte les votes isolés, on exige
+  >50 % des votes restants, on retire `unknown`/`NF`) il reste **31 412 images**.
+- Découpage **officiel** via la colonne `Usage` : 25 060 train / 3 199 validation (`PublicTest`) / 3 153 test (`PrivateTest`).
+- **Fort déséquilibre** : `neutre`+`joie` ≈ 64 % des images ; `dégoût` et `mépris` ≈ 0,5 % chacune.
+
+## Démarche (notebook `notebooks/expressions_faciales.ipynb`)
+
+| Partie | Contenu | Points clés |
+|:------:|---------|-------------|
+| 1 | Données & préparation | Chargement + alignement des 2 fichiers, labels par vote majoritaire, split officiel, normalisation `/255`, one-hot |
+| 2 | Modèle de référence (dense) | `Flatten → Dense(256) → Softmax` : **contrôle** sans structure spatiale (50,6 %) |
+| 3 | CNN | 3 blocs `Conv→BatchNorm→MaxPool` (32/64/128) → `Dense(128)+Dropout` → Softmax ; ~685k paramètres |
+| 4 | Entraînement | Adam, `categorical_crossentropy`, EarlyStopping + ReduceLROnPlateau ; lecture des courbes (surapprentissage après l'époque 10) |
+| 5 | Évaluation & erreurs | Matrice de confusion + rapport par classe ; confusions typiques `tristesse→neutre`, `peur→surprise` |
+| 6 | Expérimentations | 3 expériences (une variable à la fois), choix du modèle final sur le **F1 macro** de validation |
+| 7 | Enrichissement | Data augmentation et comparaison des variantes (intégrées à la partie 6) |
+| 8 | Détection multi-visages | **YOLOv8-face** (modèle entraîné aux visages, pas COCO) → crop → même prétraitement → CNN |
+| 9 | Vidéo (bonus) | `analyser_image` appliqué image par image (~47 images/s) |
+
+**Points défendables.** Le jeu de **test** ne sert qu'à l'évaluation finale ; tous les
+choix se font sur la **validation**. L'expérience « poids des classes » a **échoué**
+(accuracy 0,35) : les poids extrêmes (26× pour `dégoût`/`mépris`) déstabilisent
+l'entraînement — résultat négatif conservé et expliqué.
 
 ## Structure du dépôt
 
 ```
 .
-├── notebooks/      # notebooks Colab (socle + extensions)
-├── data/           # datasets (ignoré par git — voir .gitignore)
-├── models/         # modèles entraînés / checkpoints (ignoré par git)
-├── src/            # code réutilisable (prétraitement, modèles, utils)
+├── notebooks/
+│   └── expressions_faciales.ipynb   # notebook complet (parties 0 à 9)
+├── data/
+│   ├── fer2013new.csv               # labels FER+ (suivi)
+│   └── fer2013.csv                  # pixels (NON suivi : ~290 Mo, via Kaggle)
+├── models/                          # modèles / poids (non suivis)
+├── src/
 ├── requirements.txt
 └── README.md
 ```
 
-## Installation
+## Exécution
 
-### En local (venv)
+Le notebook télécharge les données automatiquement : `fer2013.csv` via **kagglehub**
+(`deadskull7/fer2013`) et `fer2013new.csv` depuis le repo Microsoft. Un `kaggle.json`
+peut être nécessaire pour la partie Kaggle.
+
+### Google Colab (recommandé)
+
+*Exécution → Modifier le type d'exécution → GPU*, puis **Exécuter tout**.
+
+### En local
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate      # Windows : .venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-### Sur Google Colab
-
-La plupart des dépendances sont préinstallées. Pour les compléter :
-
-```python
-!pip install -r requirements.txt
+jupyter notebook notebooks/expressions_faciales.ipynb
 ```
 
 ## Livrables
 
-1. Un notebook Python / Colab structuré, fonctionnel et commenté, exécutable de
-   bout en bout.
-2. Une présentation de la démarche, des architectures, des expériences et des
-   résultats.
-3. Une démonstration du modèle final.
+1. Notebook Python / Colab structuré, commenté, exécutable de bout en bout.
+2. Présentation de la démarche, des architectures, des expériences et des résultats.
+3. Démonstration du modèle final (parties 8 et 9).
