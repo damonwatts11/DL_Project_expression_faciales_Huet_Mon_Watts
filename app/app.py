@@ -11,6 +11,7 @@
 
 import os
 import tempfile
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -21,8 +22,12 @@ from PIL import Image
 CLASS_NAMES = ['neutre', 'joie', 'surprise', 'tristesse',
                'colere', 'degout', 'peur', 'mepris']
 IMG_SIZE = (48, 48)
-MODEL_PATH = os.environ.get('EMOTION_MODEL', 'models/emotion_cnn.keras')
-FACE_WEIGHTS = 'models/yolov8n-face.pt'
+# Chemins resolus par rapport a la racine du repo (parent du dossier app/),
+# donc models/ est trouve quel que soit le dossier d'ou on lance streamlit.
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODELS_DIR = BASE_DIR / 'models'
+MODEL_PATH = os.environ.get('EMOTION_MODEL', str(MODELS_DIR / 'emotion_cnn.keras'))
+FACE_WEIGHTS = str(MODELS_DIR / 'yolov8n-face.pt')
 FACE_URL = 'https://github.com/akanametov/yolo-face/releases/download/1.0.0/yolov8n-face.pt'
 
 st.set_page_config(page_title='Expressions faciales', layout='wide')
@@ -37,7 +42,7 @@ def load_emotion_model():
 
 @st.cache_resource(show_spinner='Chargement du detecteur de visages...')
 def load_detector():
-    os.makedirs('models', exist_ok=True)
+    os.makedirs(MODELS_DIR, exist_ok=True)
     try:
         from ultralytics import YOLO
         if not os.path.exists(FACE_WEIGHTS):
