@@ -63,3 +63,7 @@ Thumbs.db
 .env
 *.key
 kaggle.json
+
+# --- Exception : labels FER+ (petit, suivi dans le repo) ---
+# Prioritaire sur data/* et *.csv ci-dessus (derniere regle gagne).
+!data/fer2013new.csv
