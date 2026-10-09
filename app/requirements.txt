@@ -1,0 +1,10 @@
+# Dependances de l'application Streamlit
+streamlit>=1.36
+streamlit-webrtc>=0.47
+av>=11
+tensorflow>=2.15
+opencv-python-headless>=4.8
+ultralytics>=8.1
+pillow>=10
+numpy>=1.24
+pandas>=2.0
